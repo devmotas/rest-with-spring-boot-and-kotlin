@@ -1,8 +1,7 @@
 package com.example.controller
 
-import com.example.data.vo.v1.PersonVO
-import com.example.data.vo.v2.PersonVO as PersonVOV2
-import com.example.services.PersonService
+import com.example.data.vo.v1.BookVO
+import com.example.services.BookService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
@@ -14,26 +13,25 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
-//@CrossOrigin
 @RestController
-@RequestMapping("api/person/v1", produces = [MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE])
-@Tag(name = "People", description = "Endpoint for manage people")
-class PersonController {
+@RequestMapping("api/book/v1", produces = [MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE])
+@Tag(name = "Books", description = "Endpoint for manage books")
+class BookController {
 
     @Autowired
-    private lateinit var personService: PersonService
+    private lateinit var bookService: BookService
 
     @GetMapping
     @Operation(
-        summary = "Find all people", description = "Get all people",
-        tags = ["People"], responses = [
+        summary = "Find all books", description = "Get all books",
+        tags = ["Books"], responses = [
             ApiResponse(
                 description = "Success",
                 responseCode = "200",
                 content = [
                     Content(
                         array = ArraySchema(
-                            schema = Schema(implementation = PersonVO::class)
+                            schema = Schema(implementation = BookVO::class)
                         )
                     )]
             ),
@@ -80,21 +78,20 @@ class PersonController {
 
         ]
     )
-    fun findAll(): List<PersonVO> {
-        return personService.findAll()
+    fun findAll(): List<BookVO> {
+        return bookService.findAll()
     }
 
-    @CrossOrigin(origins = ["http://localhost:8080"])
     @GetMapping(value = ["/{id}"])
     @Operation(
-        summary = "Finds a person", description = "Finds a person",
-        tags = ["People"], responses = [
+        summary = "Finds a book", description = "Finds a book",
+        tags = ["Books"], responses = [
             ApiResponse(
                 description = "Success",
                 responseCode = "200",
                 content = [
                     Content(
-                        schema = Schema(implementation = PersonVO::class)
+                        schema = Schema(implementation = BookVO::class)
 
                     )]
             ),
@@ -143,21 +140,20 @@ class PersonController {
     )
     fun findById(
         @PathVariable(value = "id") id: Long,
-    ): PersonVO {
-        return personService.findById(id)
+    ): BookVO {
+        return bookService.findById(id)
     }
 
-    @CrossOrigin(origins = ["http://localhost:8080", "https://erudio.com.br"])
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE])
     @Operation(
-        summary = "Adds a new person", description = "Adds a new person",
-        tags = ["People"], responses = [
+        summary = "Adds a new book", description = "Adds a new book",
+        tags = ["Books"], responses = [
             ApiResponse(
                 description = "Success",
                 responseCode = "200",
                 content = [
                     Content(
-                        schema = Schema(implementation = PersonVO::class)
+                        schema = Schema(implementation = BookVO::class)
 
                     )]
             ),
@@ -188,29 +184,29 @@ class PersonController {
 
         ]
     )
-    fun createPerson(
-        @RequestBody person: PersonVO
-    ): PersonVO {
-        return personService.create(person)
+    fun createBook(
+        @RequestBody book: BookVO
+    ): BookVO {
+        return bookService.create(book)
     }
 
 //    @PostMapping(value = ["/v2"], consumes = [MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE])
-//    fun createPersonV2(
-//        @RequestBody person: PersonVOV2
-//    ): PersonVOV2 {
-//        return personService.createV2(person)
+//    fun createBookV2(
+//        @RequestBody book: BookVOV2
+//    ): BookVOV2 {
+//        return bookService.createV2(book)
 //    }
 
     @PutMapping(consumes = [MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE])
     @Operation(
-        summary = "Updates a person information", description = "Updates a person information",
-        tags = ["People"], responses = [
+        summary = "Updates a book information", description = "Updates a book information",
+        tags = ["Books"], responses = [
             ApiResponse(
                 description = "Success",
                 responseCode = "200",
                 content = [
                     Content(
-                        schema = Schema(implementation = PersonVO::class)
+                        schema = Schema(implementation = BookVO::class)
 
                     )]
             ),
@@ -257,16 +253,16 @@ class PersonController {
 
         ]
     )
-    fun updatePerson(
-        @RequestBody person: PersonVO
-    ): PersonVO {
-        return personService.update(person)
+    fun updateBook(
+        @RequestBody book: BookVO
+    ): BookVO {
+        return bookService.update(book)
     }
 
     @DeleteMapping(value = ["/{id}"])
     @Operation(
-        summary = "Deletes a person", description = "Deletes a person",
-        tags = ["People"], responses = [
+        summary = "Deletes a book", description = "Deletes a book",
+        tags = ["Books"], responses = [
 
             ApiResponse(
                 description = "No Content",
@@ -311,10 +307,10 @@ class PersonController {
 
         ]
     )
-    fun deletePerson(
+    fun deleteBook(
         @PathVariable(value = "id") id: Long,
     ): ResponseEntity<*> {
-        personService.delete(id)
+        bookService.delete(id)
         return ResponseEntity.noContent().build<Any>()
     }
 }
