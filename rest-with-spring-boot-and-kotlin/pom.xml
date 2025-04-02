@@ -12,7 +12,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.example</groupId>
+    <groupId>br.com.erudio</groupId>
     <artifactId>rest-with-spring-boot-and-kotlin</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>rest-with-spring-boot-and-kotlin</name>
