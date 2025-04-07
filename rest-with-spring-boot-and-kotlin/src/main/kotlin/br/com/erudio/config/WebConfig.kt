@@ -32,6 +32,7 @@ class WebConfig : WebMvcConfigurer {
             .allowedOriginPatterns(
                 "http://localhost:3000",
                 "http://localhost:8080",
+                "http://localhost:8888",
                 "https://erudio.com.br"
             )
             .allowedMethods("*")

@@ -2,8 +2,9 @@ package br.com.erudio
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.hateoas.config.EnableHypermediaSupport
 
-
+@EnableHypermediaSupport(type = [EnableHypermediaSupport.HypermediaType.HAL])
 @SpringBootApplication
 class RestWithSpringBootAndKotlinApplication
 

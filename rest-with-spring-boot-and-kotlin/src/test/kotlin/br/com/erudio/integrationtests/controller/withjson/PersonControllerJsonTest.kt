@@ -5,6 +5,7 @@ import br.com.erudio.integrationtests.testcontainers.AbstractIntegrationTest
 import br.com.erudio.integrationtests.vo.AccountCredentialsVO
 import br.com.erudio.integrationtests.vo.PersonVO
 import br.com.erudio.integrationtests.vo.TokenVO
+import br.com.erudio.integrationtests.vo.wrappers.WrapperPersonVO
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
@@ -37,24 +38,23 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
     @Test
     @Order(0)
     fun testLogin() {
-        val user = AccountCredentialsVO(
-            username = "gustavo",
-            password = "123456"
-        )
+        val user = AccountCredentialsVO()
+        user.username = "gustavo"
+        user.password = "123456"
 
-        val token = RestAssured.given()
+        val token = given()
             .basePath("/auth/signin")
-                .port(TestConfigs.SERVER_PORT)
-                .contentType(TestConfigs.CONTENT_TYPE_JSON)
-                .body(user)
+            .port(TestConfigs.SERVER_PORT)
+            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .body(user)
             .`when`()
             .post()
-                .then()
-                    .statusCode(200)
-                        .extract()
-                    .body()
-                        .`as`(TokenVO::class.java)
-                            .accessToken
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .`as`(TokenVO::class.java)
+            .accessToken
 
         specification = RequestSpecBuilder()
             .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, "Bearer $token")
@@ -211,6 +211,10 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
         val content = given()
             .spec(specification)
             .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .queryParams(
+                    "page", 3,
+                    "size",12,
+                    "direction", "asc")
             .`when`()
             .get()
             .then()
@@ -219,20 +223,21 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
             .body()
             .asString()
 
-        val people = objectMapper.readValue(content, Array<PersonVO>::class.java)
+        val wrapper = objectMapper.readValue(content, WrapperPersonVO::class.java)
+        val people = wrapper.embedded!!.people
 
-        val item1 = people[0]
+        val item1 = people?.get(0)
 
-        assertNotNull(item1.id)
+        assertNotNull(item1!!.id)
         assertNotNull(item1.firstName)
         assertNotNull(item1.lastName)
         assertNotNull(item1.address)
         assertNotNull(item1.gender)
-        assertEquals("Ayrton", item1.firstName)
-        assertEquals("Senna", item1.lastName)
-        assertEquals("São Paulo", item1.address)
+        assertEquals("Allin", item1.firstName)
+        assertEquals("Otridge", item1.lastName)
+        assertEquals("09846 Independence Center", item1.address)
         assertEquals("Male", item1.gender)
-        assertEquals(true, item1.enabled)
+        assertEquals(false, item1.enabled)
 
         val item2 = people[6]
 
@@ -241,16 +246,50 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
         assertNotNull(item2.lastName)
         assertNotNull(item2.address)
         assertNotNull(item2.gender)
-        assertEquals("Nikola", item2.firstName)
-        assertEquals("Tesla", item2.lastName)
-        assertEquals("Smiljan - Croatia", item2.address)
-        assertEquals("Male", item2.gender)
-        assertEquals(true, item2.enabled)
+        assertEquals("Alvera", item2.firstName)
+        assertEquals("MacMillan", item2.lastName)
+        assertEquals("59929 Loeprich Place", item2.address)
+        assertEquals("Female", item2.gender)
+        assertEquals(false, item2.enabled)
     }
-
 
     @Test
     @Order(7)
+    fun testFindByName() {
+        val content = given()
+            .spec(specification)
+            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .pathParam("firstName", "gust")
+                .queryParams(
+                    "page", 0,
+                    "size",12,
+                    "direction", "asc")
+            .`when`()["findPersonByName/{firstName}"]
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString()
+
+        val wrapper = objectMapper.readValue(content, WrapperPersonVO::class.java)
+        val people = wrapper.embedded!!.people
+
+        val item1 = people?.get(0)
+
+        assertNotNull(item1!!.id)
+        assertNotNull(item1.firstName)
+        assertNotNull(item1.lastName)
+        assertNotNull(item1.address)
+        assertNotNull(item1.gender)
+        assertEquals("Aguste", item1.firstName)
+        assertEquals("Jorin", item1.lastName)
+        assertEquals("8 Jenna Alley", item1.address)
+        assertEquals("Male", item1.gender)
+        assertEquals(true, item1.enabled)
+    }
+
+    @Test
+    @Order(8)
     fun testFindAllWithoutToken() {
 
         val specificationWithoutToken: RequestSpecification = RequestSpecBuilder()
@@ -272,6 +311,37 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
             .asString()
 
     }
+
+    @Test
+    @Order(7)
+    fun testHATEOAS() {
+        val content = given()
+            .spec(specification)
+            .contentType(TestConfigs.CONTENT_TYPE_JSON)
+            .queryParams(
+                "page", 3,
+                "size", 12,
+                "direction", "asc")
+            .`when`()
+            .get()
+            .then()
+            .statusCode(200)
+            .extract()
+            .body()
+            .asString()
+
+        assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8080/api/person/v1/207"}}"""))
+        assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8080/api/person/v1/805"}}"""))
+        assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8080/api/person/v1/694"}}"""))
+        assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8080/api/person/v1/695"}}"""))
+
+        assertTrue(content.contains("""{"first":{"href":"http://localhost:8080/api/person/v1?direction=asc&page=0&size=12&sort=firstName,asc"}"""))
+        assertTrue(content.contains(""","prev":{"href":"http://localhost:8080/api/person/v1?direction=asc&page=2&size=12&sort=firstName,asc"}"""))
+        assertTrue(content.contains(""","self":{"href":"http://localhost:8080/api/person/v1?direction=asc&page=3&size=12&sort=firstName,asc"}"""))
+        assertTrue(content.contains(""","next":{"href":"http://localhost:8080/api/person/v1?direction=asc&page=4&size=12&sort=firstName,asc"}"""))
+        assertTrue(content.contains(""","last":{"href":"http://localhost:8080/api/person/v1?direction=asc&page=83&size=12&sort=firstName,asc"}"""))
+    }
+
 
     private fun mockPerson() {
         person.firstName = "Richard"

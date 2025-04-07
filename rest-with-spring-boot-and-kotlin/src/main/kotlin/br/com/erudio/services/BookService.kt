@@ -9,6 +9,10 @@ import br.com.erudio.mapper.custom.BookMapper
 import br.com.erudio.model.Book
 import br.com.erudio.repository.BookRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PagedResourcesAssembler
+import org.springframework.hateoas.EntityModel
+import org.springframework.hateoas.PagedModel
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo
 import org.springframework.stereotype.Service
 import java.util.logging.Logger
@@ -21,16 +25,17 @@ class BookService {
     @Autowired
     private lateinit var bookMapper: BookMapper
 
+    @Autowired
+    private lateinit var assembler: PagedResourcesAssembler<BookVO>
+
     private val logger = Logger.getLogger(BookController::class.java.name)
 
-    fun findAll(): List<BookVO> {
+    fun findAll(pageable: Pageable): PagedModel<EntityModel<BookVO>> {
         logger.info("Finding all books")
-        val vos: List<BookVO> = DozerMapper.parseListObjects(repository.findAll(), BookVO::class.java)
-        for (book in vos) {
-            val withSelfRel = linkTo(BookController::class.java).slash(book.key).withSelfRel()
-            book.add(withSelfRel)
-        }
-        return vos
+        val book = repository.findAll(pageable)
+        val vos = book.map { p -> DozerMapper.parseObject(p, BookVO::class.java) }
+        vos.map { p -> p.add(linkTo(BookController::class.java).slash(p.key).withSelfRel()) }
+        return assembler.toModel(vos)
     }
 
     fun findById(id: Long): BookVO {
@@ -47,7 +52,7 @@ class BookService {
     }
 
     fun create(book: BookVO?): BookVO {
-        if (book == null ) throw RequiredObjectIsNullException()
+        if (book == null) throw RequiredObjectIsNullException()
         logger.info("Create book: $book")
 
         val entity: Book = DozerMapper.parseObject(book, Book::class.java)
@@ -65,7 +70,7 @@ class BookService {
     }
 
     fun update(book: BookVO?): BookVO {
-        if (book == null ) throw RequiredObjectIsNullException()
+        if (book == null) throw RequiredObjectIsNullException()
         logger.info("Update book: $book")
         val entity = repository.findById(book.key)
             .orElseThrow {
