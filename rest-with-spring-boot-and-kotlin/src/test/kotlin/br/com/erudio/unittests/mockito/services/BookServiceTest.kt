@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
@@ -118,14 +119,12 @@ internal class BookServiceTest {
 
     @Test
     fun createWithNullBook() {
-        val exception: Exception = assertThrows(
-            RequiredObjectIsNullException::class.java
-        ) {service.create(null)}
-
-        val expectedMessage = "It is not allowed to persist a null object!"
-        val actualMessage = exception.message
-        assertTrue(actualMessage!!.contains(expectedMessage))
+        val exception = assertThrows<RequiredObjectIsNullException> {
+            service.create(null)
+        }
+        assertTrue(exception.message!!.contains("It is not allowed to persist a null object"))
     }
+
 
     @Test
     fun update() {

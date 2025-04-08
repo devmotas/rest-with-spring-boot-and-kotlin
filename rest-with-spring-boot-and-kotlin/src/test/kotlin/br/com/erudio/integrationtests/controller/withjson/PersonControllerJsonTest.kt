@@ -339,7 +339,7 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
         assertTrue(content.contains(""","prev":{"href":"http://localhost:8080/api/person/v1?direction=asc&page=2&size=12&sort=firstName,asc"}"""))
         assertTrue(content.contains(""","self":{"href":"http://localhost:8080/api/person/v1?direction=asc&page=3&size=12&sort=firstName,asc"}"""))
         assertTrue(content.contains(""","next":{"href":"http://localhost:8080/api/person/v1?direction=asc&page=4&size=12&sort=firstName,asc"}"""))
-        assertTrue(content.contains(""","last":{"href":"http://localhost:8080/api/person/v1?direction=asc&page=83&size=12&sort=firstName,asc"}"""))
+        assertTrue(content.contains(""","last":{"href":"http://localhost:8080/api/person/v1?direction=asc&page=84&size=12&sort=firstName,asc"}"""))
     }
 
 

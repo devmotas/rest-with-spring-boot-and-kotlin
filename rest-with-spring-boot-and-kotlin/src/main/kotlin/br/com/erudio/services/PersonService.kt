@@ -64,7 +64,7 @@ class PersonService {
     }
 
     fun create(person: PersonVO?): PersonVO {
-        if (person == null) throw RequiredObjectIsNullException()
+        if (person == null)  throw RequiredObjectIsNullException("It is not allowed to persist a null object!")
         logger.info("Create person: $person")
 
         val entity: Person = DozerMapper.parseObject(person, Person::class.java)
@@ -82,7 +82,7 @@ class PersonService {
     }
 
     fun update(person: PersonVO?): PersonVO {
-        if (person == null) throw RequiredObjectIsNullException()
+        if (person == null)  throw RequiredObjectIsNullException("It is not allowed to persist a null object!")
         logger.info("Update person: $person")
         val entity = repository.findById(person.key)
             .orElseThrow {

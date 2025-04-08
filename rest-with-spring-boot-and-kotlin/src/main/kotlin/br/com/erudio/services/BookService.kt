@@ -52,7 +52,7 @@ class BookService {
     }
 
     fun create(book: BookVO?): BookVO {
-        if (book == null) throw RequiredObjectIsNullException()
+        if (book == null) throw RequiredObjectIsNullException("It is not allowed to persist a null object!")
         logger.info("Create book: $book")
 
         val entity: Book = DozerMapper.parseObject(book, Book::class.java)
@@ -70,7 +70,7 @@ class BookService {
     }
 
     fun update(book: BookVO?): BookVO {
-        if (book == null) throw RequiredObjectIsNullException()
+        if (book == null) throw RequiredObjectIsNullException("It is not allowed to persist a null object!")
         logger.info("Update book: $book")
         val entity = repository.findById(book.key)
             .orElseThrow {
