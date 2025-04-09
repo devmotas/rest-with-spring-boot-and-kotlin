@@ -62,6 +62,7 @@ class SecurityConfig {
                 authorize("/auth/refresh/**", permitAll)
                 authorize("/v3/api-docs/**", permitAll)
                 authorize("/swagger-ui/**", permitAll)
+                authorize("/api/file/v1/downloadFile/**", permitAll)
                 authorize("/api/**", authenticated)
                 authorize("/users", denyAll)
             }
