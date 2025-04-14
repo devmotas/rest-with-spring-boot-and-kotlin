@@ -2,10 +2,14 @@ package br.com.erudio
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories
+import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.hateoas.config.EnableHypermediaSupport
 
 @EnableHypermediaSupport(type = [EnableHypermediaSupport.HypermediaType.HAL])
 @SpringBootApplication
+@EntityScan("br.com.erudio.model")
+@EnableJpaRepositories("br.com.erudio.repository")
 class RestWithSpringBootAndKotlinApplication
 
 fun main(args: Array<String>) {
