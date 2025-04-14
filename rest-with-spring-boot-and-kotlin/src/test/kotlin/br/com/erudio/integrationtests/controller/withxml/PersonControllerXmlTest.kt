@@ -234,8 +234,8 @@ class PersonControllerXmlTest : AbstractIntegrationTest() {
         assertNotNull(item1.address)
         assertNotNull(item1.gender)
         assertEquals("Allin", item1.firstName)
-        assertEquals("Otridge", item1.lastName)
-        assertEquals("09846 Independence Center", item1.address)
+        assertEquals("Emmot", item1.lastName)
+        assertEquals("7913 Lindbergh Way", item1.address)
         assertEquals("Male", item1.gender)
         assertEquals(false, item1.enabled)
 

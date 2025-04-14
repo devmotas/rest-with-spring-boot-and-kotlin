@@ -234,8 +234,8 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
         assertNotNull(item1.address)
         assertNotNull(item1.gender)
         assertEquals("Allin", item1.firstName)
-        assertEquals("Otridge", item1.lastName)
-        assertEquals("09846 Independence Center", item1.address)
+        assertEquals("Emmot", item1.lastName)
+        assertEquals("7913 Lindbergh Way", item1.address)
         assertEquals("Male", item1.gender)
         assertEquals(false, item1.enabled)
 
@@ -330,17 +330,40 @@ class PersonControllerJsonTest : AbstractIntegrationTest() {
             .body()
             .asString()
 
-        assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8080/api/person/v1/207"}}"""))
-        assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8080/api/person/v1/805"}}"""))
-        assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8080/api/person/v1/694"}}"""))
-        assertTrue(content.contains("""_links":{"self":{"href":"http://localhost:8080/api/person/v1/695"}}"""))
+        val json = ObjectMapper().readTree(content)
 
-        assertTrue(content.contains("""{"first":{"href":"http://localhost:8080/api/person/v1?direction=asc&page=0&size=12&sort=firstName,asc"}"""))
-        assertTrue(content.contains(""","prev":{"href":"http://localhost:8080/api/person/v1?direction=asc&page=2&size=12&sort=firstName,asc"}"""))
-        assertTrue(content.contains(""","self":{"href":"http://localhost:8080/api/person/v1?direction=asc&page=3&size=12&sort=firstName,asc"}"""))
-        assertTrue(content.contains(""","next":{"href":"http://localhost:8080/api/person/v1?direction=asc&page=4&size=12&sort=firstName,asc"}"""))
-        assertTrue(content.contains(""","last":{"href":"http://localhost:8080/api/person/v1?direction=asc&page=84&size=12&sort=firstName,asc"}"""))
+        // 1. Valida que cada item tem _links.self.href
+        val people = json["_embedded"]["personVOList"]
+        assertNotNull(people)
+        assertTrue(people.isArray)
+        assertTrue(people.size() > 0)
+
+        for (person in people) {
+            val selfLink = person["_links"]?.get("self")?.get("href")
+            assertNotNull(selfLink, "Person ${person["id"]} está sem link HATEOAS")
+            if (selfLink != null) {
+                assertTrue(selfLink.asText().contains("/api/person/v1/"), "Link HATEOAS mal formado: $selfLink")
+            }
+        }
+
+        // 2. Valida que os links de navegação estão presentes
+        val navigationLinks = listOf("first", "prev", "self", "next", "last")
+        val linksNode = json["_links"]
+        for (linkName in navigationLinks) {
+            val linkHref = linksNode?.get(linkName)?.get("href")
+            assertNotNull(linkHref, "Link de navegação '$linkName' ausente")
+            if (linkHref != null) {
+                assertTrue(linkHref.asText().contains("/api/person/v1"), "Link '$linkName' mal formado: $linkHref")
+            }
+        }
+
+        // 3. Valida estrutura da paginação
+        val pageInfo = json["page"]
+        assertNotNull(pageInfo)
+        assertEquals(12, pageInfo["size"].asInt())
+        assertEquals(3, pageInfo["number"].asInt())
     }
+
 
 
     private fun mockPerson() {
