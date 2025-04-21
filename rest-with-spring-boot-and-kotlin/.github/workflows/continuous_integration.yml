@@ -3,7 +3,7 @@ name: 🚀 Continuous Integration with Github Actions
 on:
   push:
     branches:
-      - main
+      - '*'
   workflow_dispatch:
 
 jobs:
