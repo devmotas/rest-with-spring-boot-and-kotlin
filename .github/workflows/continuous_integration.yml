@@ -43,6 +43,9 @@ jobs:
 
       - name: Docker Compose Build
         working-directory: ./
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: docker compose build
 
       - name: Tag and push image to Amazon ECR
