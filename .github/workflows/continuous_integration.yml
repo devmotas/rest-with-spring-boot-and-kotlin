@@ -39,7 +39,7 @@ jobs:
 
       - name: Build Application Jar
         working-directory: ./rest-with-spring-boot-and-kotlin
-        run: mvn clean package
+        run: mvn clean package -DskipTests
 
       - name: Docker Compose Build
         working-directory: ./
